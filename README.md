@@ -143,6 +143,7 @@ We’ll host **both** LLM inference and Docker-hosted Neo4j on **one** Ubuntu VM
 
 1. **Power On the VM**
 
+  NCT - note that when you get here it give you the option to download updates. Don't do this yet, just skip and go through the extended installation steps while in Ubuntu. Do the updates through terminal later.
    * Select `Ubuntu_AI_Lab` and click **Power On**.
    * The VM will boot from the ISO and show the Ubuntu installer.
 
@@ -183,7 +184,7 @@ We’ll host **both** LLM inference and Docker-hosted Neo4j on **one** Ubuntu VM
 
 3. **Update & Upgrade Packages**
 
-   ```bash
+   ```bash - NCT Done
    sudo apt update && sudo apt upgrade -y
    ```
 
@@ -193,7 +194,7 @@ We’ll host **both** LLM inference and Docker-hosted Neo4j on **one** Ubuntu VM
 
 4. **Install Common Tools**
 
-   ```bash
+   ```bash - NCT done
    sudo apt install -y build-essential git curl wget python3 python3-venv python3-pip
    ```
 
@@ -204,7 +205,7 @@ We’ll host **both** LLM inference and Docker-hosted Neo4j on **one** Ubuntu VM
 
 5. **Reboot (Optional but Suggested)**
 
-   ```bash
+   ```bash - NCT done
    sudo reboot
    ```
 
@@ -212,7 +213,7 @@ We’ll host **both** LLM inference and Docker-hosted Neo4j on **one** Ubuntu VM
 
 6. **Verify Virtualization Extensions Inside the VM**
 
-   ```bash
+   ```bash - NCT done. Worked but nothing new appeared
    grep -E '(vmx|svm)' /proc/cpuinfo
    ```
 
@@ -230,7 +231,7 @@ All Docker-related actions occur **inside this single Ubuntu VM** (no separate V
 
 1. **Run Docker’s Official Convenience Script**
 
-   ```bash
+   ```bash - NCT done
    curl -fsSL https://get.docker.com | sudo sh
    ```
 
@@ -246,7 +247,7 @@ All Docker-related actions occur **inside this single Ubuntu VM** (no separate V
 
 2. **Add Your User to the Docker Group**
 
-   ```bash
+   ```bash - NCT done
    sudo usermod -aG docker $USER
    ```
 
@@ -256,13 +257,13 @@ All Docker-related actions occur **inside this single Ubuntu VM** (no separate V
    * **Important**:
      ‒ To apply this change, **log out and back in**, or run:
 
-     ```bash
+     ```bash - NCT done
      newgrp docker
      ```
 
      ‒ Confirm group membership with:
 
-     ```bash
+     ```bash - NCT done, docker listed
      groups
      ```
 
@@ -270,7 +271,7 @@ All Docker-related actions occur **inside this single Ubuntu VM** (no separate V
 
 3. **Verify Docker Installation**
 
-   ```bash
+   ```bash - NCT done
    docker version
    docker info
    ```
@@ -281,13 +282,13 @@ All Docker-related actions occur **inside this single Ubuntu VM** (no separate V
    * **If You See Errors**:
      ‒ Check if `docker` daemon is running:
 
-     ```bash
+     ```bash - NCT checked
      sudo systemctl status docker
      ```
 
      ‒ If stopped, start it:
 
-     ```bash
+     ```bash - NCT ok, running
      sudo systemctl start docker
      ```
 
@@ -300,7 +301,7 @@ All Docker-related actions occur **inside this single Ubuntu VM** (no separate V
 
 1. **Install via APT**
 
-   ```bash
+   ```bash - NCT done
    sudo apt install -y docker-compose-plugin
    ```
 
@@ -310,7 +311,7 @@ All Docker-related actions occur **inside this single Ubuntu VM** (no separate V
 
 2. **Verify**
 
-   ```bash
+   ```bash - NCT done
    docker compose version
    ```
 
@@ -329,7 +330,7 @@ We’ll create a folder (`~/ai_graph_lab`) containing a `docker-compose.yml` fil
 
 1. **Make the Folder**
 
-   ```bash
+   ```bash - NCT done
    mkdir -p ~/ai_graph_lab
    cd ~/ai_graph_lab
    ```
@@ -343,13 +344,13 @@ We’ll create a folder (`~/ai_graph_lab`) containing a `docker-compose.yml` fil
 
 2. **Verify Permissions**
 
-   ```bash
+   ```bash - NCT done
    ls -ld .
    ```
 
    * Ensure `labuser` owns the folder and can read/write. If you see root ownership, run:
 
-     ```bash
+     ```bash - NCT done, remember, labuser=ncterry
      sudo chown -R labuser:labuser ~/ai_graph_lab
      ```
 
@@ -357,18 +358,17 @@ We’ll create a folder (`~/ai_graph_lab`) containing a `docker-compose.yml` fil
 
 1. **Open an Editor**
 
-   ```bash
+   ```bash - NCT done
    nano docker-compose.yml
    ```
 
-2. **Paste the Following Configuration**
+2. **Paste the Following Configuration** - NCT done
 
    ```yaml
-   version: "3.8"
 
    services:
      neo4j:
-       image: neo4j:4.5
+       image: neo4j:4.4.25-community
        container_name: neo4j-lab
        # Port mappings: HostPort:ContainerPort
        ports:
@@ -386,7 +386,6 @@ We’ll create a folder (`~/ai_graph_lab`) containing a `docker-compose.yml` fil
 
    **Line-by-Line Clarification**:
 
-   * **`version: "3.8"`**: Specifies the Compose file format version. 3.8 is widely supported on recent Docker Engine releases.
    * **`services:`**: We declare a service named `neo4j`.
    * **`image: neo4j:4.5`**: Pulls the official Neo4j 4.5 Community Edition image from Docker Hub.
      ‒ You could use `neo4j:5.9-community` for Neo4j 5.x.
@@ -409,7 +408,8 @@ We’ll create a folder (`~/ai_graph_lab`) containing a `docker-compose.yml` fil
 
 1. **Bring Up the Container**
 
-   ```bash
+   ```bash - NCT Done, in the yml, note I had to change the 'image: neo4j:4.4.25-community', it was another before that would not compose
+   mkdir -p ~/ai_graph_lab/neo4j_data
    cd ~/ai_graph_lab
    docker compose up -d
    ```
@@ -422,7 +422,7 @@ We’ll create a folder (`~/ai_graph_lab`) containing a `docker-compose.yml` fil
 
 2. **Verify the Container Is Running**
 
-   ```bash
+   ```bash - NCT Done
    docker ps
    ```
 
@@ -434,13 +434,13 @@ We’ll create a folder (`~/ai_graph_lab`) containing a `docker-compose.yml` fil
      ```
    * If `STATUS` is `Up (healthy)` (or similar), Neo4j is running. If you see `Restarting` or `Exited`, inspect logs:
 
-     ```bash
+     ```bash - NCT it was up and healthy.Did not run this
      docker logs neo4j-lab
      ```
 
      ‒ Look for errors like “out of memory” or permission issues.
 
-3. **Access Neo4j Browser in Ubuntu VM**
+3. **Access Neo4j Browser in Ubuntu VM** - NCT - done, connected
 
    * Open Firefox (or any browser) inside the Ubuntu VM.
    * Navigate to:
@@ -458,7 +458,7 @@ We’ll create a folder (`~/ai_graph_lab`) containing a `docker-compose.yml` fil
 
    * While Ubuntu VM’s terminal is open, run:
 
-     ```bash
+     ```bash - NCT done, confirmed
      ls ~/ai_graph_lab/neo4j_data
      ```
    * You should see subdirectories like `databases`, `logical_logs`, `neo4j.conf`, `plugins`, etc. That confirms the volume mapping is working.
@@ -504,7 +504,7 @@ This section provides in-depth guidance on installing Python, creating a virtual
 
 2. **Install Python 3 and Virtualenv**
 
-   ```bash
+   ```bash - NCT done
    sudo apt update
    sudo apt install -y python3 python3-venv python3-pip
    ```
@@ -514,7 +514,7 @@ This section provides in-depth guidance on installing Python, creating a virtual
 
 3. **Verify Python Version**
 
-   ```bash
+   ```bash - NCT done, Python 3.12.3, pip 24.0
    python3 --version
    pip3 --version
    ```
@@ -525,13 +525,13 @@ This section provides in-depth guidance on installing Python, creating a virtual
 
 1. **Navigate to Home Directory**
 
-   ```bash
+   ```bash - NCT done
    cd ~
    ```
 
 2. **Create Virtualenv Named `venv-llm`**
 
-   ```bash
+   ```bash - NCT done
    python3 -m venv venv-llm
    ```
 
@@ -542,7 +542,7 @@ This section provides in-depth guidance on installing Python, creating a virtual
 
 3. **Activate the Virtualenv**
 
-   ```bash
+   ```bash - NCT done
    source ~/venv-llm/bin/activate
    ```
 
@@ -551,7 +551,7 @@ This section provides in-depth guidance on installing Python, creating a virtual
 
 4. **Upgrade `pip`**
 
-   ```bash
+   ```bash - NCT done
    pip install --upgrade pip
    ```
 
@@ -561,7 +561,7 @@ This section provides in-depth guidance on installing Python, creating a virtual
 
 1. **Install PyTorch, Transformers, and SentencePiece**
 
-   ```bash
+   ```bash - NCT done
    pip install torch torchvision transformers sentencepiece
    ```
 
@@ -577,7 +577,7 @@ This section provides in-depth guidance on installing Python, creating a virtual
 
 3. **Confirm Installation**
 
-   ```bash
+   ```bash - NCT done
    python3 -c "import torch, transformers, sentencepiece; print('Packages loaded successfully')"
    ```
 
